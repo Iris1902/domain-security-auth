@@ -9,7 +9,7 @@ provider "aws" {
 module "encrypt" {
   source       = "./modules/microservice"
   name         = "encrypt"
-  image        = "ievinan/ms-encrypt"
+  image        = "ievinan/microservice-encrypt"
   port         = 8080
-  branch       = var.BRANCH_NAME
+  branch       = "dev"
 }

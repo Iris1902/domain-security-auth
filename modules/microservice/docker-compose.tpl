@@ -9,10 +9,12 @@ chmod +x /usr/local/bin/docker-compose
 cat <<EOL > /home/ubuntu/docker-compose.yml
 version: '3'
 services:
-  ms-${name}:
+  ${name}:
     image: ${image}:${tag}
     ports:
       - "${port}:${port}"
+    environment:
+      - PORT=${port}
 EOL
 
 systemctl start docker
