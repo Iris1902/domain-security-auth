@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     bucket         = "domain-security-auth-tfstate"
     key            = "terraform.tfstate"
-    region         = var.AWS_REGION
+    region         = "us-east-1"
     dynamodb_table = "domain-security-auth-tfstate-locks"
     encrypt        = true
   }
