@@ -2,9 +2,26 @@ resource "aws_security_group" "sg" {
   name_prefix = "${var.name}-sg"
   vpc_id      = var.vpc_id
 
+   # SSH (solo tú deberías limitar por IP si es producción)
   ingress {
-    from_port   = var.port
-    to_port     = var.port
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Puerto 80 (HTTP)
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Puerto 8080 (microservicio)
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
