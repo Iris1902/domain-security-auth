@@ -33,33 +33,6 @@ jobs:
       - name: Initialize Terraform
         run: terraform init
 
-      - name: Import AWS resources if they already exist
-        run: |
-          set -e
-
-          echo "🔍 Importando recursos si existen en AWS..."
-
-          # Intentar importar Key Pair
-          aws ec2 describe-key-pairs --key-names encrypt-key >/dev/null 2>&1 && \
-          terraform import module.encrypt.aws_key_pair.key encrypt-key || \
-          echo "🔑 Key pair 'encrypt-key' no existe, se creará."
-
-          # Intentar importar el Load Balancer
-          LB_ARN=$(aws elbv2 describe-load-balancers --names encrypt-alb --query "LoadBalancers[0].LoadBalancerArn" --output text 2>/dev/null)
-          if [ "$LB_ARN" != "None" ]; then
-            terraform import module.encrypt.aws_lb.alb "$LB_ARN"
-          else
-            echo "🌀 Load Balancer 'encrypt-alb' no existe, se creará."
-          fi
-
-          # Intentar importar el Target Group
-          TG_ARN=$(aws elbv2 describe-target-groups --names encrypt-tg --query "TargetGroups[0].TargetGroupArn" --output text 2>/dev/null)
-          if [ "$TG_ARN" != "None" ]; then
-            terraform import module.encrypt.aws_lb_target_group.tg "$TG_ARN"
-          else
-            echo "🎯 Target Group 'encrypt-tg' no existe, se creará."
-          fi
-
       - name: Validate Terraform
         run: terraform validate
 
