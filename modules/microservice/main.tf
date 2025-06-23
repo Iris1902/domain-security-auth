@@ -36,7 +36,8 @@ resource "aws_launch_template" "lt" {
   user_data = base64encode(templatefile("${path.module}/docker-compose.tpl", {
     image = var.image,
     tag   = var.branch,
-    port  = var.port
+    port  = var.port,
+    name  = var.name
   }))
 }
 
