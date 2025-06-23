@@ -31,7 +31,7 @@ jobs:
           git config --global user.name "Iris1902"
 
       - name: Initialize Terraform
-        run: terraform init
+        run: terraform init -migrate-state
 
       - name: Validate Terraform
         run: terraform validate
