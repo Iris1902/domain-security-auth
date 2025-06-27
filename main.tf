@@ -1,7 +1,3 @@
-terraform {
-  backend "s3" {}
-}
-
 provider "aws" {
   region     = var.AWS_REGION
   access_key = var.AWS_ACCESS_KEY_ID
@@ -18,6 +14,17 @@ module "encrypt" {
   branch       = "dev"
 }
 
+# --- SNS Topic y Subscription para notificaciones ---
+resource "aws_sns_topic" "asg_alerts" {
+  name = "asg-alerts-topic"
+}
+
+resource "aws_sns_topic_subscription" "email" {
+  topic_arn = aws_sns_topic.asg_alerts.arn
+  protocol  = "email"
+  endpoint  = "ievinan@uce.edu.ec"
+}
+
 # --- CloudWatch para métricas del Auto Scaling Group ---
 resource "aws_cloudwatch_metric_alarm" "asg_high_cpu" {
   alarm_name          = "asg-high-cpu-utilization"
@@ -32,5 +39,5 @@ resource "aws_cloudwatch_metric_alarm" "asg_high_cpu" {
   dimensions = {
     AutoScalingGroupName = module.encrypt.name
   }
-  alarm_actions = [] # Puedes agregar acciones como SNS aquí
+  alarm_actions = [aws_sns_topic.asg_alerts.arn]
 }
