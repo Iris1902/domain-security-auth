@@ -105,11 +105,3 @@ resource "aws_autoscaling_group" "asg" {
     create_before_destroy = true
   }
 }
-
-resource "aws_autoscaling_group_instance_refresh" "refresh" {
-  autoscaling_group_name = aws_autoscaling_group.asg.name
-  preferences {
-    min_healthy_percentage = 50
-  }
-  triggers = ["launch_template"]
-}

@@ -61,16 +61,23 @@ jobs:
             -var="AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}" \
             -var="BRANCH_NAME=${{ github.ref_name }}"
 
-      - name: Refresh ASG Instances Only
-        if: success()
+      - name: Terminate ASG Instances (Refrescar microservicio)
         run: |
-          echo "🔄 Refrescando instancias del Auto Scaling Group (sin recrear toda la infraestructura)..."
-          terraform apply -auto-approve -target=module.encrypt.aws_autoscaling_group_instance_refresh.refresh \
-            -var="AWS_REGION=${{ secrets.AWS_REGION }}" \
-            -var="AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" \
-            -var="AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-            -var="AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}" \
-            -var="BRANCH_NAME=${{ github.ref_name }}"
+          echo "🔄 Terminando instancias de los Auto Scaling Groups de todos los microservicios..."
+          for ASG_NAME in $(aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[].AutoScalingGroupName" --output text); do
+            echo "Procesando ASG: $ASG_NAME"
+            INSTANCE_IDS=$(aws autoscaling describe-auto-scaling-groups \
+              --auto-scaling-group-names $ASG_NAME \
+              --query "AutoScalingGroups[0].Instances[].InstanceId" \
+              --output text)
+            for id in $INSTANCE_IDS; do
+              echo "Etiquetando y terminando instancia $id ..."
+              aws ec2 create-tags --resources $id --tags Key=Name,Value=$ASG_NAME-instance
+              aws autoscaling terminate-instance-in-auto-scaling-group \
+                --instance-id $id \
+                --should-decrement-desired-capacity false
+            done
+          done
 
       - name: Destroy on failure
         if: failure()
