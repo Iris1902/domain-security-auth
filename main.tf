@@ -37,7 +37,7 @@ resource "aws_cloudwatch_metric_alarm" "asg_high_cpu" {
   threshold           = 70
   alarm_description   = "Alarma si el promedio de CPU de las instancias del ASG supera el 70%"
   dimensions = {
-    AutoScalingGroupName = module.encrypt.name
+    AutoScalingGroupName = module.encrypt.asg_name
   }
   alarm_actions = [aws_sns_topic.asg_alerts.arn]
 }
