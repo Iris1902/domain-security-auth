@@ -1,11 +1,5 @@
 terraform {
-  backend "s3" {
-    bucket         = "domain-security-auth-tfstate"
-    key            = "terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "domain-security-auth-tfstate-locks"
-    encrypt        = true
-  }
+  backend "s3" {}
 }
 
 provider "aws" {
@@ -22,4 +16,21 @@ module "encrypt" {
   image        = "ievinan/microservice-encrypt"
   port         = 8080
   branch       = "dev"
+}
+
+# --- CloudWatch para métricas del Auto Scaling Group ---
+resource "aws_cloudwatch_metric_alarm" "asg_high_cpu" {
+  alarm_name          = "asg-high-cpu-utilization"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 120
+  statistic           = "Average"
+  threshold           = 70
+  alarm_description   = "Alarma si el promedio de CPU de las instancias del ASG supera el 70%"
+  dimensions = {
+    AutoScalingGroupName = module.encrypt.name
+  }
+  alarm_actions = [] # Puedes agregar acciones como SNS aquí
 }

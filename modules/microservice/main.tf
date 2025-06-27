@@ -91,9 +91,9 @@ resource "aws_lb_listener" "listener" {
 }
 
 resource "aws_autoscaling_group" "asg" {
-  desired_capacity     = 1
-  max_size             = 2
-  min_size             = 1
+  min_size             = 2
+  max_size             = 3
+  desired_capacity     = 2
   vpc_zone_identifier  = var.subnets
   target_group_arns    = [aws_lb_target_group.tg.arn]
   launch_template {
@@ -104,4 +104,12 @@ resource "aws_autoscaling_group" "asg" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_autoscaling_group_instance_refresh" "refresh" {
+  autoscaling_group_name = aws_autoscaling_group.asg.name
+  preferences {
+    min_healthy_percentage = 50
+  }
+  triggers = ["launch_template"]
 }
