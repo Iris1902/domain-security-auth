@@ -12,6 +12,7 @@ on:
 jobs:
   terraform-apply:
     runs-on: ubuntu-latest
+    continue-on-error: true
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -73,9 +74,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Refrescar instancias de todos los ASG (uno a uno)
+      - name: Refrescar instancias de todos los ASG
         run: |
-          echo "🔄 Refrescando instancias de los Auto Scaling Groups de todos los microservicios, una por una..."
+          echo "🔄 Refrescando instancias de los Auto Scaling Groups de todos los microservicios..."
           for ASG_NAME in $(aws autoscaling describe-auto-scaling-groups --region $AWS_REGION --query "AutoScalingGroups[].AutoScalingGroupName" --output text); do
             echo "Procesando ASG: $ASG_NAME"
             INSTANCE_IDS=$(aws autoscaling describe-auto-scaling-groups \
@@ -87,21 +88,6 @@ jobs:
               echo "Etiquetando y terminando instancia $id ..."
               aws ec2 create-tags --region $AWS_REGION --resources $id --tags Key=Name,Value=$ASG_NAME-instance
               aws autoscaling terminate-instance-in-auto-scaling-group --region $AWS_REGION --instance-id $id --no-should-decrement-desired-capacity
-              echo "Esperando a que una nueva instancia esté InService..."
-              while true; do
-                NEW_INSTANCE_IDS=$(aws autoscaling describe-auto-scaling-groups \
-                  --region $AWS_REGION \
-                  --auto-scaling-group-names $ASG_NAME \
-                  --query "AutoScalingGroups[0].Instances[?LifecycleState=='InService'].InstanceId" \
-                  --output text)
-                COUNT=$(echo $NEW_INSTANCE_IDS | wc -w)
-                if [ "$COUNT" -ge 2 ]; then
-                  echo "Nueva instancia en servicio. Continuando..."
-                  break
-                fi
-                echo "Esperando 15 segundos..."
-                sleep 15
-              done
             done
           done
       - name: Forzar éxito si el refresco fue exitoso
