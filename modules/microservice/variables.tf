@@ -20,12 +20,12 @@ variable "branch" {
 
 variable "vpc_id" {
   type    = string
-  default = "vpc-0bd3d78866e1a84fe"
+  default = "vpc-0697808a974fef452"
 }
 
 variable "subnets" {
   type    = list(string)
-  default = ["subnet-069c95c7245ffac3b", "subnet-0920caca965c22b39"]
+  default = ["subnet-0049cf73cb42dc01f", "subnet-03bd5e4b54dfcfb6e"]
 }
 
 variable "ami_id" {
