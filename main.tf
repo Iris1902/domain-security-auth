@@ -14,17 +14,6 @@ module "encrypt" {
   branch       = "dev"
 }
 
-# --- SNS Topic y Subscription para notificaciones ---
-resource "aws_sns_topic" "asg_alerts" {
-  name = "asg-alerts-topic"
-}
-
-resource "aws_sns_topic_subscription" "email" {
-  topic_arn = aws_sns_topic.asg_alerts.arn
-  protocol  = "email"
-  endpoint  = "ievinan@uce.edu.ec"
-}
-
 # --- CloudWatch para métricas del Auto Scaling Group ---
 resource "aws_cloudwatch_metric_alarm" "asg_high_cpu" {
   alarm_name          = "asg-high-cpu-utilization"
@@ -39,5 +28,4 @@ resource "aws_cloudwatch_metric_alarm" "asg_high_cpu" {
   dimensions = {
     AutoScalingGroupName = module.encrypt.asg_name
   }
-  alarm_actions = [aws_sns_topic.asg_alerts.arn]
 }
