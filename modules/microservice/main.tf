@@ -105,3 +105,5 @@ resource "aws_autoscaling_group" "asg" {
     create_before_destroy = true
   }
 }
+
+
