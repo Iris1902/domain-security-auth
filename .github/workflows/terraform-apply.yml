@@ -86,10 +86,7 @@ jobs:
             for id in $INSTANCE_IDS; do
               echo "Etiquetando y terminando instancia $id ..."
               aws ec2 create-tags --region $AWS_REGION --resources $id --tags Key=Name,Value=$ASG_NAME-instance
-              aws autoscaling terminate-instance-in-auto-scaling-group \
-                --region $AWS_REGION \
-                --instance-id $id \
-                --should-decrement-desired-capacity false
+              aws autoscaling terminate-instance-in-auto-scaling-group --region $AWS_REGION --instance-id $id --should-decrement-desired-capacity false
             done
           done
       - name: Forzar éxito si el refresco fue exitoso
