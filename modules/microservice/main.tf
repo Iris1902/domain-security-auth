@@ -21,7 +21,7 @@ resource "aws_security_group" "sg" {
   # Puerto 8080 (microservicio)
   ingress {
     from_port   = 8080
-    to_port     = 8080
+    to_port     = 8082
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -51,32 +51,65 @@ resource "aws_launch_template" "lt" {
   key_name      = aws_key_pair.key.key_name
   vpc_security_group_ids = [aws_security_group.sg.id]
   user_data = base64encode(templatefile("${path.module}/docker-compose.tpl", {
-    image = var.image,
-    tag   = var.branch,
-    port  = var.port,
-    name  = var.name
+    image      = var.image,
+    tag        = var.branch,
+    port       = var.port,
+    name       = var.name,
+    jwt_secret = var.jwt_secret
   }))
 }
 
 resource "aws_lb" "alb" {
-  name               = "${var.name}-alb"
+  name               = "auth-encrypt-domain-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg.id]
   subnets            = var.subnets
 }
 
-resource "aws_lb_target_group" "tg" {
-  name     = "${var.name}-tg"
-  port     = var.port
+
+resource "aws_lb_target_group" "tg_encrypt" {
+  name     = "aed-encrypt-tg"
+  port     = 8080
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   health_check {
-    path                = "/health"
+    path                = "/encrypt/health"
     interval            = 30
     timeout             = 5
-    healthy_threshold   = 3
+    healthy_threshold   = 2
     unhealthy_threshold = 2
+    matcher             = "200"
+  }
+}
+
+resource "aws_lb_target_group" "tg_jwt" {
+  name     = "aed-jwt-tg"
+  port     = 8081
+  protocol = "HTTP"
+  vpc_id   = var.vpc_id
+  health_check {
+    path                = "/jwt/health"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200"
+  }
+}
+
+resource "aws_lb_target_group" "tg_jwt_validate" {
+  name     = "aed-jwtval-tg"
+  port     = 8082
+  protocol = "HTTP"
+  vpc_id   = var.vpc_id
+  health_check {
+    path                = "/jwt-validate/health"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200"
   }
 }
 
@@ -86,7 +119,55 @@ resource "aws_lb_listener" "listener" {
   protocol          = "HTTP"
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tg.arn
+    target_group_arn = aws_lb_target_group.tg_encrypt.arn
+  }
+}
+
+resource "aws_lb_listener_rule" "rule_encrypt" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg_encrypt.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/encrypt*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "rule_jwt" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 101
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg_jwt.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/jwt*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "rule_jwt_validate" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 102
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg_jwt_validate.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/jwt-validate*"]
+    }
   }
 }
 
@@ -95,7 +176,11 @@ resource "aws_autoscaling_group" "asg" {
   max_size             = 3
   min_size             = 2
   vpc_zone_identifier  = var.subnets
-  target_group_arns    = [aws_lb_target_group.tg.arn]
+  target_group_arns    = [
+    aws_lb_target_group.tg_encrypt.arn,
+    aws_lb_target_group.tg_jwt.arn,
+    aws_lb_target_group.tg_jwt_validate.arn
+  ]
   launch_template {
     id      = aws_launch_template.lt.id
     version = "$Latest"

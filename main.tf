@@ -5,13 +5,14 @@ provider "aws" {
   token      = var.AWS_SESSION_TOKEN
 }
 
-# Módulos para cada microservicio que desees desplegar
-module "encrypt" {
+# Módulo único para todos los microservicios de autenticación
+module "auth_services" {
   source       = "./modules/microservice"
-  name         = "encrypt"
-  image        = "ievinan/microservice-encrypt"
+  name         = "auth-encrypt-domain"
+  image        = "ievinan/microservice-encrypt" # Imagen principal, el compose levanta todas
   port         = 8080
   branch       = "dev"
+  jwt_secret   = var.jwt_secret
 }
 
 # --- SNS Topic y Subscription para notificaciones ---
@@ -28,18 +29,18 @@ resource "aws_sns_topic_subscription" "email" {
 # --- CloudWatch Alarm para el Auto Scaling Group ---
 resource "aws_cloudwatch_metric_alarm" "asg_high_cpu" {
   alarm_name          = "asg-high-cpu-utilization"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 2
+  alarm_description   = "High CPU utilization alarm for ASG"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = 120
   statistic           = "Average"
-  threshold           = 70
-  alarm_description   = "Alarma si el promedio de CPU de las instancias del ASG supera el 70%"
+  period              = 120
   dimensions = {
-    AutoScalingGroupName = module.encrypt.asg_name
+    AutoScalingGroupName = module.auth_services.asg_name
   }
-  alarm_actions = [aws_sns_topic.asg_alerts.arn]
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 80
+  evaluation_periods  = 2
+  alarm_actions       = [aws_sns_topic.asg_alerts.arn]
 }
 
 # --- CloudWatch Dashboard para monitoreo ---
@@ -55,7 +56,7 @@ resource "aws_cloudwatch_dashboard" "asg_dashboard" {
         "height" = 6,
         "properties" = {
           "metrics" = [
-            [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", module.encrypt.asg_name ]
+            [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", module.auth_services.asg_name ]
           ],
           "period" = 300,
           "stat" = "Average",

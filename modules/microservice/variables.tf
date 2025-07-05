@@ -32,3 +32,8 @@ variable "ami_id" {
   type    = string
   default = "ami-020cba7c55df1f615"
 }
+
+variable "jwt_secret" {
+  description = "Secret para el microservicio JWT"
+  type        = string
+}
