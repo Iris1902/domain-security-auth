@@ -12,27 +12,27 @@ cat <<EOL > /home/ubuntu/docker-compose.yml
 version: '3'
 services:
   encrypt:
-    image: ievinan/microservice-encrypt:${tag}
+    image: ${image_encrypt}:${tag}
     ports:
-      - "8080:8080"
+      - "${port_encrypt}:${port_encrypt}"
     environment:
-      - PORT=8080
+      - PORT=${port_encrypt}
 
   jwt:
-    image: ievinan/microservice-jwt:${tag}
+    image: ${image_jwt}:${tag}
     ports:
-      - "8081:8081"
+      - "${port_jwt}:${port_jwt}"
     environment:
-      - PORT=8081
+      - PORT=${port_jwt}
     volumes:
       - /home/ubuntu/.env:/go/src/app/.env
 
   jwt-validate:
-    image: ievinan/microservice-jwt-validate:${tag}
+    image: ${image_jwt_validate}:${tag}
     ports:
-      - "8082:8082"
+      - "${port_jwt_validate}:${port_jwt_validate}"
     environment:
-      - PORT=8082
+      - PORT=${port_jwt_validate}
     volumes:
       - /home/ubuntu/.env:/go/src/app/.env
 EOL

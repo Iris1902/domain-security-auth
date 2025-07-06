@@ -6,13 +6,22 @@ provider "aws" {
 }
 
 # Módulo único para todos los microservicios de autenticación
-module "auth_services" {
-  source       = "./modules/microservice"
-  name         = "auth-encrypt-domain"
-  image        = "ievinan/microservice-encrypt" # Imagen principal, el compose levanta todas
-  port         = 8080
-  branch       = "dev"
-  jwt_secret   = var.jwt_secret
+module "auth_microservices" {
+  source              = "./modules/microservice"
+  name                = "auth-microservices"
+  image               = "ievinan/microservice-encrypt"
+  port                = 8080
+  image_encrypt       = "ievinan/microservice-encrypt"
+  port_encrypt        = 8080
+  image_jwt           = "ievinan/microservice-jwt"
+  port_jwt            = 8081
+  image_jwt_validate  = "ievinan/microservice-jwt-validate"
+  port_jwt_validate   = 8082
+  branch              = var.BRANCH_NAME
+  jwt_secret          = var.jwt_secret
+  vpc_id              = var.vpc_id
+  subnet1             = var.subnet1
+  subnet2             = var.subnet2
 }
 
 # --- SNS Topic y Subscription para notificaciones ---

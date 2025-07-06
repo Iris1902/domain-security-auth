@@ -51,7 +51,10 @@ jobs:
             -var="AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -var="AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
             -var="AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}" \
-            -var="BRANCH_NAME=${{ github.ref_name }}"
+            -var="BRANCH_NAME=${{ github.ref_name }}" \
+            -var="vpc_id=${{ secrets.VPC_ID }}" \
+            -var="subnet1=${{ secrets.SUBNET1 }}" \
+            -var="subnet2=${{ secrets.SUBNET2 }}"
       
       - name: Apply Terraform (con control de error)
         id: apply-tf
@@ -62,7 +65,10 @@ jobs:
             -var="AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -var="AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
             -var="AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}" \
-            -var="BRANCH_NAME=${{ github.ref_name }}"
+            -var="BRANCH_NAME=${{ github.ref_name }}" \
+            -var="vpc_id=${{ secrets.VPC_ID }}" \
+            -var="subnet1=${{ secrets.SUBNET1 }}" \
+            -var="subnet2=${{ secrets.SUBNET2 }}"
           echo $? > tf_exit_code.txt
       - name: Set refresh flag if needed
         id: set-flag

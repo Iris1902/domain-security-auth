@@ -19,15 +19,22 @@ variable "branch" {
 }
 
 variable "vpc_id" {
-  type    = string
-  default = "vpc-0697808a974fef452"
+  type        = string
+  default = "vpc-07ed6f622674768b4"
+  description = "VPC ID para los recursos"
 }
 
-variable "subnets" {
-  type    = list(string)
-  default = ["subnet-0049cf73cb42dc01f", "subnet-03bd5e4b54dfcfb6e"]
+variable "subnet1" {
+  type        = string
+  default = "subnet-0695499f8e7e48f1f"
+  description = "ID de la primera subnet"
 }
 
+variable "subnet2" {
+  type        = string
+  default = "subnet-05d8f02253a448f99"
+  description = "ID de la segunda subnet"
+}
 variable "ami_id" {
   type    = string
   default = "ami-020cba7c55df1f615"
@@ -36,4 +43,34 @@ variable "ami_id" {
 variable "jwt_secret" {
   description = "Secret para el microservicio JWT"
   type        = string
+}
+
+variable "image_encrypt" {
+  description = "Imagen Docker para encrypt"
+  type        = string
+}
+
+variable "port_encrypt" {
+  description = "Puerto para encrypt"
+  type        = number
+}
+
+variable "image_jwt" {
+  description = "Imagen Docker para jwt"
+  type        = string
+}
+
+variable "port_jwt" {
+  description = "Puerto para jwt"
+  type        = number
+}
+
+variable "image_jwt_validate" {
+  description = "Imagen Docker para jwt-validate"
+  type        = string
+}
+
+variable "port_jwt_validate" {
+  description = "Puerto para jwt-validate"
+  type        = number
 }

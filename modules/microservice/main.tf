@@ -64,13 +64,13 @@ resource "aws_lb" "alb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg.id]
-  subnets            = var.subnets
+  subnets            = [var.subnet1, var.subnet2]
 }
 
 
 resource "aws_lb_target_group" "tg_encrypt" {
   name     = "aed-encrypt-tg"
-  port     = 8080
+  port     = var.port_encrypt
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   health_check {
@@ -85,7 +85,7 @@ resource "aws_lb_target_group" "tg_encrypt" {
 
 resource "aws_lb_target_group" "tg_jwt" {
   name     = "aed-jwt-tg"
-  port     = 8081
+  port     = var.port_jwt
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   health_check {
@@ -100,7 +100,7 @@ resource "aws_lb_target_group" "tg_jwt" {
 
 resource "aws_lb_target_group" "tg_jwt_validate" {
   name     = "aed-jwtval-tg"
-  port     = 8082
+  port     = var.port_jwt_validate
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   health_check {
@@ -126,12 +126,10 @@ resource "aws_lb_listener" "listener" {
 resource "aws_lb_listener_rule" "rule_encrypt" {
   listener_arn = aws_lb_listener.listener.arn
   priority     = 100
-
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tg_encrypt.arn
   }
-
   condition {
     path_pattern {
       values = ["/encrypt*"]
@@ -142,12 +140,10 @@ resource "aws_lb_listener_rule" "rule_encrypt" {
 resource "aws_lb_listener_rule" "rule_jwt" {
   listener_arn = aws_lb_listener.listener.arn
   priority     = 101
-
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tg_jwt.arn
   }
-
   condition {
     path_pattern {
       values = ["/jwt*"]
@@ -158,12 +154,10 @@ resource "aws_lb_listener_rule" "rule_jwt" {
 resource "aws_lb_listener_rule" "rule_jwt_validate" {
   listener_arn = aws_lb_listener.listener.arn
   priority     = 102
-
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tg_jwt_validate.arn
   }
-
   condition {
     path_pattern {
       values = ["/jwt-validate*"]
@@ -175,7 +169,7 @@ resource "aws_autoscaling_group" "asg" {
   desired_capacity     = 2
   max_size             = 3
   min_size             = 2
-  vpc_zone_identifier  = var.subnets
+  vpc_zone_identifier  = [var.subnet1, var.subnet2]
   target_group_arns    = [
     aws_lb_target_group.tg_encrypt.arn,
     aws_lb_target_group.tg_jwt.arn,
