@@ -52,6 +52,13 @@ jobs:
             -var="AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
             -var="AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}" \
             -var="BRANCH_NAME=${{ github.ref_name }}" \
+            -var="jwt_secret=${{ secrets.JWT_SECRET }}" \
+            -var="image_encrypt=ievinan/microservice-encrypt" \
+            -var="port_encrypt=8080" \
+            -var="image_jwt=ievinan/microservice-jwt" \
+            -var="port_jwt=8081" \
+            -var="image_jwt_validate=ievinan/microservice-jwt-validate" \
+            -var="port_jwt_validate=8082" \
             -var="vpc_id=${{ secrets.VPC_ID }}" \
             -var="subnet1=${{ secrets.SUBNET1 }}" \
             -var="subnet2=${{ secrets.SUBNET2 }}"
@@ -66,6 +73,13 @@ jobs:
             -var="AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
             -var="AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}" \
             -var="BRANCH_NAME=${{ github.ref_name }}" \
+            -var="jwt_secret=${{ secrets.JWT_SECRET }}" \
+            -var="image_encrypt=ievinan/microservice-encrypt" \
+            -var="port_encrypt=8080" \
+            -var="image_jwt=ievinan/microservice-jwt" \
+            -var="port_jwt=8081" \
+            -var="image_jwt_validate=ievinan/microservice-jwt-validate" \
+            -var="port_jwt_validate=8082" \
             -var="vpc_id=${{ secrets.VPC_ID }}" \
             -var="subnet1=${{ secrets.SUBNET1 }}" \
             -var="subnet2=${{ secrets.SUBNET2 }}"
