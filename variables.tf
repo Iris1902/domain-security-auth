@@ -43,7 +43,32 @@ variable "subnet2" {
   description = "ID de la segunda subnet"
 }
 
+variable "image_encrypt" {
+  description = "Imagen Docker para encrypt"
+  type        = string
+}
+
+variable "port_encrypt" {
+  description = "Puerto para encrypt"
+  type        = number
+}
+
+variable "image_jwt" {
+  description = "Imagen Docker para jwt"
+  type        = string
+}
+
+variable "port_jwt" {
+  description = "Puerto para jwt"
+  type        = number
+}
+
 variable "image_jwt_validate" {
   description = "Imagen Docker para jwt-validate"
   type        = string
+}
+
+variable "port_jwt_validate" {
+  description = "Puerto para jwt-validate"
+  type        = number
 }
