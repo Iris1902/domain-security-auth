@@ -53,11 +53,13 @@ resource "aws_launch_template" "lt" {
   user_data = base64encode(templatefile("${path.module}/docker-compose.tpl", {
     image_encrypt      = var.image_encrypt,
     port_encrypt       = var.port_encrypt,
+    tag_encrypt        = var.tag_encrypt,
     image_jwt          = var.image_jwt,
     port_jwt           = var.port_jwt,
+    tag_jwt            = var.tag_jwt,
     image_jwt_validate = var.image_jwt_validate,
     port_jwt_validate  = var.port_jwt_validate,
-    tag                = var.branch,
+    tag_jwt_validate   = var.tag_jwt_validate,
     name               = var.name,
     jwt_secret         = var.jwt_secret
   }))

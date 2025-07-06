@@ -15,7 +15,10 @@ module "auth_microservices" {
   port_jwt            = 8081
   image_jwt_validate  = "ievinan/microservice-jwt-validate"
   port_jwt_validate   = 8082
-  branch              = var.BRANCH_NAME
+  tag_encrypt         = "dev"
+  tag_jwt             = "dev"
+  tag_jwt_validate    = "dev"
+  branch              = "dev"
   jwt_secret          = var.jwt_secret
   vpc_id              = var.vpc_id
   subnet1             = var.subnet1

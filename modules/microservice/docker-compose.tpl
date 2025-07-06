@@ -12,14 +12,14 @@ cat <<EOL > /home/ubuntu/docker-compose.yml
 version: '3'
 services:
   encrypt:
-    image: ${image_encrypt}:${tag}
+    image: ${image_encrypt}:${tag_encrypt}
     ports:
       - "${port_encrypt}:${port_encrypt}"
     environment:
       - PORT=${port_encrypt}
 
   jwt:
-    image: ${image_jwt}:${tag}
+    image: ${image_jwt}:${tag_jwt}
     ports:
       - "${port_jwt}:${port_jwt}"
     environment:
@@ -28,7 +28,7 @@ services:
       - /home/ubuntu/.env:/go/src/app/.env
 
   jwt-validate:
-    image: ${image_jwt_validate}:${tag}
+    image: ${image_jwt_validate}:${tag_jwt_validate}
     ports:
       - "${port_jwt_validate}:${port_jwt_validate}"
     environment:

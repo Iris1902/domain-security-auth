@@ -64,3 +64,18 @@ variable "port_jwt_validate" {
   description = "Puerto para jwt-validate"
   type        = number
 }
+
+variable "tag_encrypt" {
+  description = "Tag de Docker para encrypt"
+  type        = string
+}
+
+variable "tag_jwt" {
+  description = "Tag de Docker para jwt"
+  type        = string
+}
+
+variable "tag_jwt_validate" {
+  description = "Tag de Docker para jwt-validate"
+  type        = string
+}
