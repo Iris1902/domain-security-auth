@@ -9,8 +9,6 @@ provider "aws" {
 module "auth_microservices" {
   source              = "./modules/microservice"
   name                = "auth-microservices"
-  image               = "ievinan/microservice-encrypt"
-  port                = 8080
   image_encrypt       = "ievinan/microservice-encrypt"
   port_encrypt        = 8080
   image_jwt           = "ievinan/microservice-jwt"
