@@ -51,11 +51,15 @@ resource "aws_launch_template" "lt" {
   key_name      = aws_key_pair.key.key_name
   vpc_security_group_ids = [aws_security_group.sg.id]
   user_data = base64encode(templatefile("${path.module}/docker-compose.tpl", {
-    image      = var.image,
-    tag        = var.branch,
-    port       = var.port,
-    name       = var.name,
-    jwt_secret = var.jwt_secret
+    image_encrypt      = var.image_encrypt,
+    port_encrypt       = var.port_encrypt,
+    image_jwt          = var.image_jwt,
+    port_jwt           = var.port_jwt,
+    image_jwt_validate = var.image_jwt_validate,
+    port_jwt_validate  = var.port_jwt_validate,
+    tag                = var.branch,
+    name               = var.name,
+    jwt_secret         = var.jwt_secret
   }))
 }
 

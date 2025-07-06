@@ -44,7 +44,7 @@ resource "aws_cloudwatch_metric_alarm" "asg_high_cpu" {
   statistic           = "Average"
   period              = 120
   dimensions = {
-    AutoScalingGroupName = module.auth_services.asg_name
+    AutoScalingGroupName = module.auth_microservices.asg_name
   }
   comparison_operator = "GreaterThanThreshold"
   threshold           = 80
@@ -65,7 +65,7 @@ resource "aws_cloudwatch_dashboard" "asg_dashboard" {
         "height" = 6,
         "properties" = {
           "metrics" = [
-            [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", module.auth_services.asg_name ]
+            [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", module.auth_microservices.asg_name ]
           ],
           "period" = 300,
           "stat" = "Average",

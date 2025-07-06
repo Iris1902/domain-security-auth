@@ -3,16 +3,6 @@ variable "name" {
   type        = string
 }
 
-variable "image" {
-  description = "Imagen Docker"
-  type        = string
-}
-
-variable "port" {
-  description = "Puerto expuesto"
-  type        = number
-}
-
 variable "branch" {
   description = "Tag de Docker"
   type        = string
