@@ -10,27 +10,27 @@ cat <<EOL > /home/ubuntu/docker-compose.yml
 version: '3'
 services:
   encrypt:
-    image: ievinan/microservice-encrypt:\${tag}
+    image: ievinan/microservice-encrypt:${tag}
     ports:
       - "8080:8080"
     environment:
       - PORT=8080
 
   jwt:
-    image: ievinan/microservice-jwt:\${tag}
+    image: ievinan/microservice-jwt:${tag}
     ports:
       - "8081:8081"
     environment:
       - PORT=8081
-      - JWT_SECRET=\${jwt_secret}
+      - JWT_SECRET=${jwt_secret}
 
   jwt-validate:
-    image: ievinan/microservice-jwt-validate:\${tag}
+    image: ievinan/microservice-jwt-validate:${tag}
     ports:
       - "8082:8082"
     environment:
       - PORT=8082
-      - JWT_SECRET=\${jwt_secret}
+      - JWT_SECRET=${jwt_secret}
 EOL
 
 systemctl start docker
