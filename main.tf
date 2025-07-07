@@ -5,21 +5,12 @@ provider "aws" {
   token      = var.AWS_SESSION_TOKEN
 }
 
-# Módulos para cada microservicio que desees desplegar
-module "encrypt" {
+# Módulo único para todos los microservicios de autenticación
+module "auth_services" {
   source       = "./modules/microservice"
-  name         = "encrypt"
-  image        = "ievinan/microservice-encrypt"
+  name         = "auth-services"
+  image        = "ievinan/microservice-encrypt" # Imagen principal, el compose levanta todas
   port         = 8080
-  branch       = "dev"
-  jwt_secret   = var.jwt_secret
-}
-
-module "jwt" {
-  source       = "./modules/microservice"
-  name         = "jwt"
-  image        = "ievinan/microservice-jwt"
-  port         = 8081
   branch       = "dev"
   jwt_secret   = var.jwt_secret
 }
@@ -42,8 +33,9 @@ resource "aws_cloudwatch_metric_alarm" "asg_high_cpu" {
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
   statistic           = "Average"
+  period              = 120
   dimensions = {
-    AutoScalingGroupName = module.encrypt.asg_name
+    AutoScalingGroupName = module.auth_services.asg_name
   }
   comparison_operator = "GreaterThanThreshold"
   threshold           = 80
@@ -64,7 +56,7 @@ resource "aws_cloudwatch_dashboard" "asg_dashboard" {
         "height" = 6,
         "properties" = {
           "metrics" = [
-            [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", module.encrypt.asg_name ]
+            [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", module.auth_services.asg_name ]
           ],
           "period" = 300,
           "stat" = "Average",
