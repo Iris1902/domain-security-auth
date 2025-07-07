@@ -43,7 +43,7 @@ resource "aws_cloudwatch_metric_alarm" "asg_high_cpu" {
   namespace           = "AWS/EC2"
   statistic           = "Average"
   dimensions = {
-    AutoScalingGroupName = aws_autoscaling_group.example.name
+    AutoScalingGroupName = module.encrypt.asg_name
   }
   comparison_operator = "GreaterThanThreshold"
   threshold           = 80
