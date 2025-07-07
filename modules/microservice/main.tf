@@ -60,7 +60,7 @@ resource "aws_launch_template" "lt" {
 }
 
 resource "aws_lb" "alb" {
-  name               = "${var.name}-alb"
+  name               = "auth-encrypt-domain-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg.id]
@@ -69,7 +69,7 @@ resource "aws_lb" "alb" {
 
 
 resource "aws_lb_target_group" "tg_encrypt" {
-  name     = "encrypt-tg"
+  name     = "auth-encrypt-domain-encrypt-tg"
   port     = 8080
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -84,7 +84,7 @@ resource "aws_lb_target_group" "tg_encrypt" {
 }
 
 resource "aws_lb_target_group" "tg_jwt" {
-  name     = "jwt-tg"
+  name     = "auth-encrypt-domain-jwt-tg"
   port     = 8081
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -99,7 +99,7 @@ resource "aws_lb_target_group" "tg_jwt" {
 }
 
 resource "aws_lb_target_group" "tg_jwt_validate" {
-  name     = "jwt-validate-tg"
+  name     = "auth-encrypt-domain-jwt-validate-tg"
   port     = 8082
   protocol = "HTTP"
   vpc_id   = var.vpc_id

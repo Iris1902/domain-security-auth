@@ -8,7 +8,7 @@ provider "aws" {
 # Módulo único para todos los microservicios de autenticación
 module "auth_services" {
   source       = "./modules/microservice"
-  name         = "auth-services"
+  name         = "auth-encrypt-domain"
   image        = "ievinan/microservice-encrypt" # Imagen principal, el compose levanta todas
   port         = 8080
   branch       = "dev"
