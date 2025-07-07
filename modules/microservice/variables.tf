@@ -32,3 +32,20 @@ variable "ami_id" {
   type    = string
   default = "ami-020cba7c55df1f615"
 }
+
+variable "jwt_secret" {
+  description = "Secret para el microservicio JWT"
+  type        = string
+}
+
+variable "jwt_generate_port" {
+  description = "Puerto para el endpoint generate-jwt"
+  type        = number
+  default     = 8081
+}
+
+variable "jwt_validate_port" {
+  description = "Puerto para el endpoint validate-jwt"
+  type        = number
+  default     = 8082
+}

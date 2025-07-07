@@ -9,12 +9,21 @@ chmod +x /usr/local/bin/docker-compose
 cat <<EOL > /home/ubuntu/docker-compose.yml
 version: '3'
 services:
-  ${name}:
-    image: ${image}:${tag}
+  encrypt:
+    image: \${image}:\${tag}
     ports:
-      - "${port}:${port}"
+      - "8080:8080"
     environment:
-      - PORT=${port}
+      - PORT=8080
+
+  jwt:
+    image: \${image}:\${tag}
+    ports:
+      - "8081:8081"
+      - "8082:8082"
+    environment:
+      - PORT=8081
+      - JWT_SECRET=\${jwt_secret}
 EOL
 
 systemctl start docker

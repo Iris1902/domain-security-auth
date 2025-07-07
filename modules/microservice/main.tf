@@ -80,6 +80,51 @@ resource "aws_lb_target_group" "tg" {
   }
 }
 
+resource "aws_lb_target_group" "tg_encrypt" {
+  name     = "encrypt-tg"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = var.vpc_id
+  health_check {
+    path                = "/encrypt/hash/health"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200"
+  }
+}
+
+resource "aws_lb_target_group" "tg_jwt_generate" {
+  name     = "jwt-generate-tg"
+  port     = 8081
+  protocol = "HTTP"
+  vpc_id   = var.vpc_id
+  health_check {
+    path                = "/jwt/generate-jwt/health"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200"
+  }
+}
+
+resource "aws_lb_target_group" "tg_jwt_validate" {
+  name     = "jwt-validate-tg"
+  port     = 8082
+  protocol = "HTTP"
+  vpc_id   = var.vpc_id
+  health_check {
+    path                = "/jwt-validate/validate-jwt/health"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200"
+  }
+}
+
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.alb.arn
   port              = 80
@@ -87,6 +132,48 @@ resource "aws_lb_listener" "listener" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tg.arn
+  }
+}
+
+resource "aws_lb_listener_rule" "rule_encrypt" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 100
+  condition {
+    path_pattern {
+      values = ["/encrypt/hash*"]
+    }
+  }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg_encrypt.arn
+  }
+}
+
+resource "aws_lb_listener_rule" "rule_jwt_generate" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 101
+  condition {
+    path_pattern {
+      values = ["/jwt/generate-jwt*"]
+    }
+  }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg_jwt_generate.arn
+  }
+}
+
+resource "aws_lb_listener_rule" "rule_jwt_validate" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 102
+  condition {
+    path_pattern {
+      values = ["/jwt-validate/validate-jwt*"]
+    }
+  }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg_jwt_validate.arn
   }
 }
 

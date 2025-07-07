@@ -19,3 +19,8 @@ variable "BRANCH_NAME" {
   type    = string
   default = "dev"
 }
+
+variable "jwt_secret" {
+  description = "Secret para el microservicio JWT"
+  type        = string
+}
