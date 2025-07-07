@@ -21,7 +21,7 @@ resource "aws_security_group" "sg" {
   # Puerto 8080 (microservicio)
   ingress {
     from_port   = 8080
-    to_port     = 8080
+    to_port     = 8082
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -66,19 +66,6 @@ resource "aws_lb" "alb" {
   subnets            = var.subnets
 }
 
-resource "aws_lb_target_group" "tg" {
-  name     = "${var.name}-tg"
-  port     = var.port
-  protocol = "HTTP"
-  vpc_id   = var.vpc_id
-  health_check {
-    path                = "/health"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 3
-    unhealthy_threshold = 2
-  }
-}
 
 resource "aws_lb_target_group" "tg_encrypt" {
   name     = "encrypt-tg"
@@ -86,7 +73,7 @@ resource "aws_lb_target_group" "tg_encrypt" {
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   health_check {
-    path                = "/encrypt/hash/health"
+    path                = "/encrypt/health"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
@@ -95,13 +82,13 @@ resource "aws_lb_target_group" "tg_encrypt" {
   }
 }
 
-resource "aws_lb_target_group" "tg_jwt_generate" {
-  name     = "jwt-generate-tg"
+resource "aws_lb_target_group" "tg_jwt" {
+  name     = "jwt-tg"
   port     = 8081
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   health_check {
-    path                = "/jwt/generate-jwt/health"
+    path                = "/jwt/health"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
@@ -116,7 +103,7 @@ resource "aws_lb_target_group" "tg_jwt_validate" {
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   health_check {
-    path                = "/jwt-validate/validate-jwt/health"
+    path                = "/jwt-validate/health"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
@@ -140,7 +127,7 @@ resource "aws_lb_listener_rule" "rule_encrypt" {
   priority     = 100
   condition {
     path_pattern {
-      values = ["/encrypt/hash*"]
+      values = ["/encrypt*"]
     }
   }
   action {
@@ -149,17 +136,17 @@ resource "aws_lb_listener_rule" "rule_encrypt" {
   }
 }
 
-resource "aws_lb_listener_rule" "rule_jwt_generate" {
+resource "aws_lb_listener_rule" "rule_jwt" {
   listener_arn = aws_lb_listener.listener.arn
   priority     = 101
   condition {
     path_pattern {
-      values = ["/jwt/generate-jwt*"]
+      values = ["/jwt*"]
     }
   }
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tg_jwt_generate.arn
+    target_group_arn = aws_lb_target_group.tg_jwt.arn
   }
 }
 
@@ -168,7 +155,7 @@ resource "aws_lb_listener_rule" "rule_jwt_validate" {
   priority     = 102
   condition {
     path_pattern {
-      values = ["/jwt-validate/validate-jwt*"]
+      values = ["/jwt-validate*"]
     }
   }
   action {
@@ -182,7 +169,11 @@ resource "aws_autoscaling_group" "asg" {
   max_size             = 3
   min_size             = 2
   vpc_zone_identifier  = var.subnets
-  target_group_arns    = [aws_lb_target_group.tg.arn]
+  target_group_arns    = [
+    aws_lb_target_group.tg_encrypt.arn,
+    aws_lb_target_group.tg_jwt.arn,
+    aws_lb_target_group.tg_jwt_validate.arn
+  ]
   launch_template {
     id      = aws_launch_template.lt.id
     version = "$Latest"
