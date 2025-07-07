@@ -51,10 +51,11 @@ resource "aws_launch_template" "lt" {
   key_name      = aws_key_pair.key.key_name
   vpc_security_group_ids = [aws_security_group.sg.id]
   user_data = base64encode(templatefile("${path.module}/docker-compose.tpl", {
-    image = var.image,
-    tag   = var.branch,
-    port  = var.port,
-    name  = var.name
+    image      = var.image,
+    tag        = var.branch,
+    port       = var.port,
+    name       = var.name,
+    jwt_secret = var.jwt_secret
   }))
 }
 
@@ -118,49 +119,55 @@ resource "aws_lb_listener" "listener" {
   protocol          = "HTTP"
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tg.arn
+    target_group_arn = aws_lb_target_group.tg_encrypt.arn
   }
 }
 
 resource "aws_lb_listener_rule" "rule_encrypt" {
   listener_arn = aws_lb_listener.listener.arn
   priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg_encrypt.arn
+  }
+
   condition {
     path_pattern {
       values = ["/encrypt*"]
     }
-  }
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tg_encrypt.arn
   }
 }
 
 resource "aws_lb_listener_rule" "rule_jwt" {
   listener_arn = aws_lb_listener.listener.arn
   priority     = 101
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg_jwt.arn
+  }
+
   condition {
     path_pattern {
       values = ["/jwt*"]
     }
-  }
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tg_jwt.arn
   }
 }
 
 resource "aws_lb_listener_rule" "rule_jwt_validate" {
   listener_arn = aws_lb_listener.listener.arn
   priority     = 102
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tg_jwt_validate.arn
+  }
+
   condition {
     path_pattern {
       values = ["/jwt-validate*"]
     }
-  }
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tg_jwt_validate.arn
   }
 }
 
