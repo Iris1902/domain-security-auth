@@ -25,7 +25,7 @@ services:
     environment:
       - PORT=8081
     volumes:
-      - /home/ubuntu/.env:/app/.env
+      - /home/ubuntu/.env:/go/src/app/.env
 
   jwt-validate:
     image: ievinan/microservice-jwt-validate:${tag}
@@ -34,7 +34,7 @@ services:
     environment:
       - PORT=8082
     volumes:
-      - /home/ubuntu/.env:/app/.env
+      - /home/ubuntu/.env:/go/src/app/.env
 EOL
 
 systemctl start docker
