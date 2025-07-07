@@ -6,6 +6,8 @@ apt install -y docker.io curl
 curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
+echo "JWT_SECRET=${jwt_secret}" > /home/ubuntu/.env
+
 cat <<EOL > /home/ubuntu/docker-compose.yml
 version: '3'
 services:
@@ -22,7 +24,8 @@ services:
       - "8081:8081"
     environment:
       - PORT=8081
-      - JWT_SECRET=${jwt_secret}
+    env_file:
+      - /home/ubuntu/.env
 
   jwt-validate:
     image: ievinan/microservice-jwt-validate:${tag}
@@ -30,7 +33,8 @@ services:
       - "8082:8082"
     environment:
       - PORT=8082
-      - JWT_SECRET=${jwt_secret}
+    env_file:
+      - /home/ubuntu/.env
 EOL
 
 systemctl start docker
