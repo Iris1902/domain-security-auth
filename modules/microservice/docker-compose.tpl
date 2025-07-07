@@ -24,8 +24,8 @@ services:
       - "8081:8081"
     environment:
       - PORT=8081
-    env_file:
-      - /home/ubuntu/.env
+    volumes:
+      - /home/ubuntu/.env:/app/.env
 
   jwt-validate:
     image: ievinan/microservice-jwt-validate:${tag}
@@ -33,8 +33,8 @@ services:
       - "8082:8082"
     environment:
       - PORT=8082
-    env_file:
-      - /home/ubuntu/.env
+    volumes:
+      - /home/ubuntu/.env:/app/.env
 EOL
 
 systemctl start docker
