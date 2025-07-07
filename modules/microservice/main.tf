@@ -69,7 +69,7 @@ resource "aws_lb" "alb" {
 
 
 resource "aws_lb_target_group" "tg_encrypt" {
-  name     = "auth-encrypt-domain-encrypt-tg"
+  name     = "aed-encrypt-tg"
   port     = 8080
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -84,7 +84,7 @@ resource "aws_lb_target_group" "tg_encrypt" {
 }
 
 resource "aws_lb_target_group" "tg_jwt" {
-  name     = "auth-encrypt-domain-jwt-tg"
+  name     = "aed-jwt-tg"
   port     = 8081
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -99,7 +99,7 @@ resource "aws_lb_target_group" "tg_jwt" {
 }
 
 resource "aws_lb_target_group" "tg_jwt_validate" {
-  name     = "auth-encrypt-domain-jwt-validate-tg"
+  name     = "aed-jwtval-tg"
   port     = 8082
   protocol = "HTTP"
   vpc_id   = var.vpc_id
